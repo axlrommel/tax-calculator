@@ -21,18 +21,18 @@ export interface IResults {
 }
 
 function optimizeRetirementWithdrawals(ssIncome: number, rothBalance: number, tradBalance: number, spendingGoal: number, filingStatus: "single" | "married") {
-  const thresholds = filingStatus === "married" ? 
-      { ssBase1: 32000, ssBase2: 44000, taxBrackets: [23200, 94200] } 
-      : { ssBase1: 25000, ssBase2: 34000, taxBrackets: [11600, 47150] };
+  const thresholds = filingStatus === "married" ?
+    { ssBase1: 32000, ssBase2: 44000, taxBrackets: [23200, 94200] }
+    : { ssBase1: 25000, ssBase2: 34000, taxBrackets: [11600, 47150] };
 
   let provisionalIncome = ssIncome * 0.5; // Half of Social Security is counted for provisional income
   let taxableIncome = 0;
-  let withdrawals = { 
-    fromRoth: 0, 
-    fromTrad: 0, 
-    taxesPaid: 0, 
-    ssIncome: ssIncome, 
-    spendingGoal: spendingGoal 
+  let withdrawals = {
+    fromRoth: 0,
+    fromTrad: 0,
+    taxesPaid: 0,
+    ssIncome: ssIncome,
+    spendingGoal: spendingGoal
   };
 
   // Step 1: Calculate remaining spending needed after Social Security
@@ -53,10 +53,10 @@ function optimizeRetirementWithdrawals(ssIncome: number, rothBalance: number, tr
   if (remainingSpending > 0) {
     // Calculate taxes on potential Traditional IRA withdrawal
     let estimatedTradWithdrawal = remainingSpending;
-    
+
     // Update provisional income with Traditional IRA withdrawal
     let totalProvisionalIncome = provisionalIncome + estimatedTradWithdrawal;
-    
+
     // Calculate taxable portion of Social Security
     let ssTaxable = 0;
     if (totalProvisionalIncome > thresholds.ssBase2) {
@@ -64,17 +64,17 @@ function optimizeRetirementWithdrawals(ssIncome: number, rothBalance: number, tr
     } else if (totalProvisionalIncome > thresholds.ssBase1) {
       ssTaxable = ssIncome * 0.5;
     }
-    
+
     // Calculate total taxable income
     taxableIncome = ssTaxable + estimatedTradWithdrawal;
-    
+
     // Calculate taxes
     let tax = 0;
     let taxRates = [0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37];
-    let taxBrackets = filingStatus === "married" ? 
-        [23200, 94200, 201050, 383900, 470700, 628300] 
-        : [11600, 47150, 100525, 191950, 243725, 609350];
-    
+    let taxBrackets = filingStatus === "married" ?
+      [23200, 94200, 201050, 383900, 470700, 628300]
+      : [11600, 47150, 100525, 191950, 243725, 609350];
+
     let prevBracket = 0;
     for (let i = 0; i < taxBrackets.length; i++) {
       if (taxableIncome > prevBracket) {
@@ -85,7 +85,7 @@ function optimizeRetirementWithdrawals(ssIncome: number, rothBalance: number, tr
         break;
       }
     }
-    
+
     // Total needed from Traditional IRA is remaining spending plus taxes
     let totalTradNeeded = remainingSpending + tax;
     withdrawals.fromTrad = Math.min(totalTradNeeded, tradBalance);
@@ -94,7 +94,7 @@ function optimizeRetirementWithdrawals(ssIncome: number, rothBalance: number, tr
 
   // Calculate final numbers
   let totalWithdrawn = ssIncome + withdrawals.fromRoth + withdrawals.fromTrad - withdrawals.taxesPaid;
-  
+
   // Verify we meet spending goal (within rounding error)
   if (Math.abs(totalWithdrawn - spendingGoal) > 0.01) {
     console.warn(`Warning: Unable to meet spending goal. Short by ${spendingGoal - totalWithdrawn}`);
@@ -104,13 +104,13 @@ function optimizeRetirementWithdrawals(ssIncome: number, rothBalance: number, tr
 }
 
 export function optimizeAndSimulateRetirement(
-  ssIncome: number, 
-  rothBalance: number, 
-  tradBalance: number, 
-  spendingGoal: number, 
-  filingStatus: "married" | "single", 
-  age = 65, 
-  returnRate = 0.05, 
+  ssIncome: number,
+  rothBalance: number,
+  tradBalance: number,
+  spendingGoal: number,
+  filingStatus: "married" | "single",
+  age = 65,
+  returnRate = 0.05,
   inflationRate = 0.01
 ): IResults {
   let currentRothBalance = rothBalance;
@@ -118,17 +118,17 @@ export function optimizeAndSimulateRetirement(
   let currentSpendingGoal = spendingGoal;
   let years = 0;
   let annualDetails = [] as ICalculations[];
-  let medicareCost = calculateMedicareCosts(ssIncome, filingStatus); // Initial Medicare cost
+  let medicareCost = 0; // Initial Medicare cost
 
   while (currentRothBalance + currentTradBalance > 0) {
     let currentAge = age + years;
 
     // Optimize withdrawals
     let withdrawals = optimizeRetirementWithdrawals(
-      ssIncome, 
-      currentRothBalance, 
-      currentTradBalance, 
-      currentSpendingGoal, 
+      ssIncome,
+      currentRothBalance,
+      currentTradBalance,
+      currentSpendingGoal,
       filingStatus
     );
 
@@ -141,9 +141,11 @@ export function optimizeAndSimulateRetirement(
     }
 
     // Update **Medicare costs** based on taxable income
-    medicareCost = calculateMedicareCosts(withdrawals.fromTrad, filingStatus, years);
-    if(filingStatus === 'married') {
-      medicareCost *= 2; //if married then we need to account for both spouses
+    if (currentAge >= 65) {
+      medicareCost = calculateMedicareCosts(withdrawals.fromTrad, filingStatus, years);
+      if (filingStatus === 'married') {
+        medicareCost *= 2; //if married then we need to account for both spouses
+      }
     }
 
     // Ensure spending goal is met
@@ -168,7 +170,7 @@ export function optimizeAndSimulateRetirement(
     // Apply **inflation adjustments** to spending and Medicare costs
     currentSpendingGoal *= (1 + inflationRate);
     medicareCost *= (1 + inflationRate);
-    
+
     // Adjust **Social Security for COLA**
     ssIncome *= (1 + inflationRate);
 
