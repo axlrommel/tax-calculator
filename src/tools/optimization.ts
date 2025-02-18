@@ -1,4 +1,5 @@
 import { calculateMedicareCosts } from "./calculateMedicare"
+import { calculateRMD } from "./calculateRMD"
 
 export interface ICalculations {
   year: number
@@ -122,13 +123,6 @@ export function optimizeAndSimulateRetirement(
   while (currentRothBalance + currentTradBalance > 0) {
     let currentAge = age + years;
 
-    // Calculate RMD if applicable
-    let rmd = 0;
-    if (currentAge >= 73) {
-      let lifeExpectancyFactor = 27.4 - (currentAge - 73);
-      rmd = currentTradBalance / Math.max(lifeExpectancyFactor, 1);
-    }
-
     // Optimize withdrawals
     let withdrawals = optimizeRetirementWithdrawals(
       ssIncome, 
@@ -138,6 +132,8 @@ export function optimizeAndSimulateRetirement(
       filingStatus
     );
 
+    const rmd = calculateRMD(currentAge, currentTradBalance);
+
     // Handle RMD if necessary
     if (withdrawals.fromTrad < rmd) {
       let additionalTrad = Math.min(rmd - withdrawals.fromTrad, currentTradBalance);
@@ -145,10 +141,10 @@ export function optimizeAndSimulateRetirement(
     }
 
     // Update **Medicare costs** based on taxable income
-    medicareCost = calculateMedicareCosts(withdrawals.fromTrad, filingStatus);
-
-    // Deduct Medicare from Social Security
-    let netSSIncome = Math.max(ssIncome - medicareCost, 0); 
+    medicareCost = calculateMedicareCosts(withdrawals.fromTrad, filingStatus, years);
+    if(filingStatus === 'married') {
+      medicareCost *= 2; //if married then we need to account for both spouses
+    }
 
     // Ensure spending goal is met
     let totalAvailable = currentRothBalance + currentTradBalance;
@@ -188,7 +184,6 @@ export function optimizeAndSimulateRetirement(
       withdrawalsFromTrad: Math.round(withdrawals.fromTrad),
       totalAmountWithdrawn: Math.round(withdrawals.fromRoth + withdrawals.fromTrad),
       ssIncome: Math.round(ssIncome),
-      netSSIncome: Math.round(netSSIncome), // Net after Medicare
       currentSpendingGoal: Math.round(currentSpendingGoal),
       taxesPaid: Math.round(withdrawals.taxesPaid),
       medicareCosts: Math.round(medicareCost)
