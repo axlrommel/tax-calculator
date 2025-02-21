@@ -74,10 +74,6 @@ export function optimizeAndSimulateRetirement(
     currentRothBalance *= (1 + returnRate);
     currentTradBalance *= (1 + returnRate);
 
-    // Apply **inflation adjustments** to spending and Medicare costs
-    currentSpendingGoal *= (1 + inflationRate);
-    medicareCost *= (1 + inflationRate);
-
     const extraFromRMD = rmd - currentSpendingGoal - ssIncome
 
     // Store annual data
@@ -96,6 +92,10 @@ export function optimizeAndSimulateRetirement(
       requiredMinimumDistributions: Math.round(rmd),
       extraFromRMD: Math.round(extraFromRMD > 0 ? extraFromRMD : 0)
     });
+
+    // Apply **inflation adjustments** to spending and Medicare costs for next year
+    currentSpendingGoal *= (1 + inflationRate);
+    medicareCost *= (1 + inflationRate);
 
     years++;
 
