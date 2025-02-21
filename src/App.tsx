@@ -3,9 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import './App.css'
-import { calculateYearlySocialSecurity } from "./tools/calculateSocSec";
 import { optimizeAndSimulateRetirement } from "./tools/optimization";
-import { ICalculations } from "./tools/types";
+import { IAges, ICalculations } from "./tools/types";
 
 let USDollar = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -26,9 +25,11 @@ function App() {
   const [yearsLast, setYearsLast] = useState<number | string>(0);
 
   const calculateRetirement = () => {
-    const claimingAge = filingStatus === 'single' ? [ssClaimAgePrimary] : [ssClaimAgePrimary, ssClaimAgeSpouse];
-    let ssIncome = claimingAge.reduce((prev, curr) => prev + calculateYearlySocialSecurity(curr), 0);
-    let strategy = optimizeAndSimulateRetirement(ssIncome, afterTax, beforeTax, spendingGoal, filingStatus, retirementAgePrimary);
+    const ages: IAges[] = [{retirementAge: retirementAgePrimary,ssClaimingAge: ssClaimAgePrimary}];
+    if(filingStatus === 'married') {
+      ages.push({retirementAge: retirementAgeSecondary,ssClaimingAge: ssClaimAgeSpouse})
+    }
+    let strategy = optimizeAndSimulateRetirement(ages, afterTax, beforeTax, spendingGoal, filingStatus);
     setResults(strategy.details);
     setYearsLast(strategy.moneyLastYears);
   }

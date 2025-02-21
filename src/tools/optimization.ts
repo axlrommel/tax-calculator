@@ -1,15 +1,15 @@
 import { calculateMedicareCosts } from "./calculateMedicare"
 import { calculateRMD } from "./calculateRMD"
+import { calculateYearlySocialSecurity } from "./calculateSocSec";
 import { optimizeRetirementWithdrawals } from "./optimizeRetirementWithdrawals";
-import { ICalculations, IResults } from "./types";
+import { IAges, ICalculations, IResults } from "./types";
 
 export function optimizeAndSimulateRetirement(
-  ssIncome: number,
+  ages: IAges[],
   rothBalance: number,
   tradBalance: number,
   spendingGoal: number,
   filingStatus: "married" | "single",
-  age = 65,
   returnRate = 0.05,
   inflationRate = 0.01
 ): IResults {
@@ -18,10 +18,13 @@ export function optimizeAndSimulateRetirement(
   let currentSpendingGoal = spendingGoal;
   let years = 0;
   let annualDetails = [] as ICalculations[];
-  let medicareCost = 0; // Initial Medicare cost
+  let medicareCost = 0;
 
   while (currentRothBalance + currentTradBalance > 0) {
-    let currentAge = age + years;
+    let currentAge = ages[0].retirementAge + years;
+
+    let ssIncome = ages.reduce(
+      (accumulator: number, age: IAges) => accumulator + calculateYearlySocialSecurity(age, currentAge, years, inflationRate), 0);
 
     // Optimize withdrawals
     let withdrawals = optimizeRetirementWithdrawals(
@@ -71,9 +74,6 @@ export function optimizeAndSimulateRetirement(
     currentSpendingGoal *= (1 + inflationRate);
     medicareCost *= (1 + inflationRate);
 
-    // Adjust **Social Security for COLA**
-    ssIncome *= (1 + inflationRate);
-
     const extraFromRMD = rmd - currentSpendingGoal - ssIncome
 
     // Store annual data
@@ -90,11 +90,11 @@ export function optimizeAndSimulateRetirement(
       taxesPaid: Math.round(withdrawals.taxesPaid),
       medicareCosts: Math.round(medicareCost),
       requiredMinimumDistributions: Math.round(rmd),
-      extraFromRMD: Math.round(extraFromRMD > 0 ? extraFromRMD : 0 )
-      });
+      extraFromRMD: Math.round(extraFromRMD > 0 ? extraFromRMD : 0)
+    });
 
-      years++;
-      
+    years++;
+
     if (years > 40) {
       return {
         moneyLastYears: "more than 40",

@@ -18,3 +18,8 @@ export interface IResults {
   moneyLastYears: number | "more than 40";
   details: ICalculations[];
 }
+
+export interface IAges {
+  retirementAge: number;
+  ssClaimingAge: number;
+}
