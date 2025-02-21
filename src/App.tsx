@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import './App.css'
 import { calculateYearlySocialSecurity } from "./tools/calculateSocSec";
-import { ICalculations, optimizeAndSimulateRetirement } from "./tools/optimization";
+import { optimizeAndSimulateRetirement } from "./tools/optimization";
+import { ICalculations } from "./tools/types";
 
 let USDollar = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -14,7 +15,10 @@ let USDollar = new Intl.NumberFormat('en-US', {
 
 function App() {
   const [filingStatus, setFilingStatus] = useState<"single" | "married">("single");
-  const [ssClaimAge, setSsClaimAge] = useState<number>(65);
+  const [retirementAgePrimary, setRetirementAgePrimary] = useState<number>(65);
+  const [retirementAgeSecondary, setRetirementAgeSecondary] = useState<number>(65);
+  const [ssClaimAgePrimary, setSsClaimAgePrimary] = useState<number>(65);
+  const [ssClaimAgeSpouse, setSsClaimAgeSpouse] = useState<number>(65);
   const [afterTax, setAfterTax] = useState(0);
   const [beforeTax, setBeforeTax] = useState(0);
   const [spendingGoal, setSpendingGoal] = useState(0)
@@ -22,9 +26,9 @@ function App() {
   const [yearsLast, setYearsLast] = useState<number | string>(0);
 
   const calculateRetirement = () => {
-    const claimingAge = filingStatus === 'single' ? [ssClaimAge] : [ssClaimAge, ssClaimAge];
+    const claimingAge = filingStatus === 'single' ? [ssClaimAgePrimary] : [ssClaimAgePrimary, ssClaimAgeSpouse];
     let ssIncome = claimingAge.reduce((prev, curr) => prev + calculateYearlySocialSecurity(curr), 0);
-    let strategy = optimizeAndSimulateRetirement(ssIncome, afterTax, beforeTax, spendingGoal, filingStatus, ssClaimAge);
+    let strategy = optimizeAndSimulateRetirement(ssIncome, afterTax, beforeTax, spendingGoal, filingStatus, retirementAgePrimary);
     setResults(strategy.details);
     setYearsLast(strategy.moneyLastYears);
   }
@@ -46,8 +50,40 @@ function App() {
           </Select>
         </div>
         <div className="w-64">
-          <label className="block text-sm font-medium">Social Security Claim Age</label>
-          <Select onValueChange={(value) => setSsClaimAge(Number(value))}>
+          <label className="block text-sm font-medium">Retirement Age</label>
+          <Select onValueChange={(value) => setRetirementAgePrimary(Number(value))}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select retirement age" />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 20 }, (_, i) => 55 + i).map((age) => (
+                <SelectItem key={age} value={age.toString()}>
+                  {age}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {filingStatus === "married" && (<div className="w-64">
+          <label className="block text-sm font-medium">Spouse Retirement Age</label>
+          <Select onValueChange={(value) => setRetirementAgeSecondary(Number(value))}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select spouse's retirement age" />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 20 }, (_, i) => 55 + i).map((age) => (
+                <SelectItem key={age} value={age.toString()}>
+                  {age}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>)}
+        <div className="w-64">
+          <label className="block text-sm font-medium">
+            {filingStatus === "married" ? "Primary Person's" : "Your"} Social Security Claim Age
+          </label>
+          <Select onValueChange={(value) => setSsClaimAgePrimary(Number(value))}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select age" />
             </SelectTrigger>
@@ -60,19 +96,36 @@ function App() {
             </SelectContent>
           </Select>
         </div>
+        {filingStatus === "married" && (
+          <div className="w-64">
+            <label className="block text-sm font-medium">Spouse's Social Security Claim Age</label>
+            <Select onValueChange={(value) => setSsClaimAgeSpouse(Number(value))}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select age" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 10 }, (_, i) => 62 + i).map((age) => (
+                  <SelectItem key={age} value={age.toString()}>
+                    {age}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <div className="w-64">
-          <label className="block text-sm font-medium">Roth Balance ($)</label>
-          <Input type="number" value={afterTax} onChange={(e) => setAfterTax(Number(e.target.value))} />
+          <label className="block text-sm font-medium">After Tax Investments (e.g. Roth) ($)</label>
+          <Input type="number" value={afterTax > 0 ? afterTax : ''} onChange={(e) => setAfterTax(Number(e.target.value))} />
         </div>
         <div className="w-64">
-          <label className="block text-sm font-medium">Traditional IRA Balance ($)</label>
-          <Input type="number" value={beforeTax} onChange={(e) => setBeforeTax(Number(e.target.value))} />
+          <label className="block text-sm font-medium">Before Tax Investments (e.g. Traditional IRA) ($)</label>
+          <Input type="number" value={beforeTax > 0 ? beforeTax : ''} onChange={(e) => setBeforeTax(Number(e.target.value))} />
         </div>
         <div className="w-64">
           <label className="block text-sm font-medium">Annual Spending Goal ($)</label>
-          <Input type="number" value={spendingGoal} onChange={(e) => setSpendingGoal(Number(e.target.value))} />
+          <Input type="number" value={spendingGoal > 0 ? spendingGoal : ''} onChange={(e) => setSpendingGoal(Number(e.target.value))} />
         </div>
-        <Button onClick={calculateRetirement} className="w-64">
+        <Button onClick={calculateRetirement} className="w-64" disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}>
           Calculate
         </Button>
         {yearsLast && (
@@ -89,9 +142,11 @@ function App() {
                     <th className="border p-2">IRA Balance</th>
                     <th className="border p-2">Roth Withdrawal</th>
                     <th className="border p-2">IRA Withdrawal</th>
+                    <th className="border p-2">Req Min Distrib</th>
                     <th className="border p-2">Spending Goal</th>
                     <th className="border p-2">Total Withdrawn</th>
                     <th className="border p-2">SS Income</th>
+                    <th className="border p-2">Extra from Req Min Distrib</th>
                     <th className="border p-2">Taxes Paid</th>
                     <th className="border p-2">Medicare Costs</th>
                   </tr>
@@ -105,9 +160,11 @@ function App() {
                       <td className="border p-2">{USDollar.format(row.tradBalance)}</td>
                       <td className="border p-2">{USDollar.format(row.withdrawalsFromRoth)}</td>
                       <td className="border p-2">{USDollar.format(row.withdrawalsFromTrad)}</td>
+                      <td className="border p-2">{USDollar.format(row.requiredMinimumDistributions)}</td>
                       <td className="border p-2">{USDollar.format(row.currentSpendingGoal)}</td>
                       <td className="border p-2">{USDollar.format(row.totalAmountWithdrawn)}</td>
                       <td className="border p-2">{USDollar.format(row.ssIncome)}</td>
+                      <td className="border p-2">{USDollar.format(row.extraFromRMD)}</td>
                       <td className="border p-2">{USDollar.format(row.taxesPaid)}</td>
                       <td className="border p-2">{USDollar.format(row.medicareCosts)}</td>
                     </tr>

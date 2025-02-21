@@ -1,107 +1,7 @@
 import { calculateMedicareCosts } from "./calculateMedicare"
 import { calculateRMD } from "./calculateRMD"
-
-export interface ICalculations {
-  year: number
-  age: number
-  rothBalance: number
-  tradBalance: number
-  withdrawalsFromRoth: number
-  withdrawalsFromTrad: number
-  totalAmountWithdrawn: number
-  ssIncome: number
-  currentSpendingGoal: number
-  taxesPaid: number
-  medicareCosts: number
-}
-
-export interface IResults {
-  moneyLastYears: number | "more than 40";
-  details: ICalculations[];
-}
-
-function optimizeRetirementWithdrawals(ssIncome: number, rothBalance: number, tradBalance: number, spendingGoal: number, filingStatus: "single" | "married") {
-  const thresholds = filingStatus === "married" ?
-    { ssBase1: 32000, ssBase2: 44000, taxBrackets: [23200, 94200] }
-    : { ssBase1: 25000, ssBase2: 34000, taxBrackets: [11600, 47150] };
-
-  let provisionalIncome = ssIncome * 0.5; // Half of Social Security is counted for provisional income
-  let taxableIncome = 0;
-  let withdrawals = {
-    fromRoth: 0,
-    fromTrad: 0,
-    taxesPaid: 0,
-    ssIncome: ssIncome,
-    spendingGoal: spendingGoal
-  };
-
-  // Step 1: Calculate remaining spending needed after Social Security
-  let remainingSpending = spendingGoal - ssIncome;
-
-  // If remaining spending is negative or zero, no withdrawals needed
-  if (remainingSpending <= 0) {
-    return withdrawals;
-  }
-
-  // Step 2: Use Roth IRA first since it doesn't affect provisional income
-  if (remainingSpending > 0 && rothBalance > 0) {
-    withdrawals.fromRoth = Math.min(remainingSpending, rothBalance);
-    remainingSpending -= withdrawals.fromRoth;
-  }
-
-  // Step 3: If still more needed, calculate Traditional IRA withdrawal
-  if (remainingSpending > 0) {
-    // Calculate taxes on potential Traditional IRA withdrawal
-    let estimatedTradWithdrawal = remainingSpending;
-
-    // Update provisional income with Traditional IRA withdrawal
-    let totalProvisionalIncome = provisionalIncome + estimatedTradWithdrawal;
-
-    // Calculate taxable portion of Social Security
-    let ssTaxable = 0;
-    if (totalProvisionalIncome > thresholds.ssBase2) {
-      ssTaxable = ssIncome * 0.85;
-    } else if (totalProvisionalIncome > thresholds.ssBase1) {
-      ssTaxable = ssIncome * 0.5;
-    }
-
-    // Calculate total taxable income
-    taxableIncome = ssTaxable + estimatedTradWithdrawal;
-
-    // Calculate taxes
-    let tax = 0;
-    let taxRates = [0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37];
-    let taxBrackets = filingStatus === "married" ?
-      [23200, 94200, 201050, 383900, 470700, 628300]
-      : [11600, 47150, 100525, 191950, 243725, 609350];
-
-    let prevBracket = 0;
-    for (let i = 0; i < taxBrackets.length; i++) {
-      if (taxableIncome > prevBracket) {
-        let taxableAtRate = Math.min(taxableIncome, taxBrackets[i]) - prevBracket;
-        tax += taxableAtRate * taxRates[i];
-        prevBracket = taxBrackets[i];
-      } else {
-        break;
-      }
-    }
-
-    // Total needed from Traditional IRA is remaining spending plus taxes
-    let totalTradNeeded = remainingSpending + tax;
-    withdrawals.fromTrad = Math.min(totalTradNeeded, tradBalance);
-    withdrawals.taxesPaid = tax;
-  }
-
-  // Calculate final numbers
-  let totalWithdrawn = ssIncome + withdrawals.fromRoth + withdrawals.fromTrad - withdrawals.taxesPaid;
-
-  // Verify we meet spending goal (within rounding error)
-  if (Math.abs(totalWithdrawn - spendingGoal) > 0.01) {
-    console.warn(`Warning: Unable to meet spending goal. Short by ${spendingGoal - totalWithdrawn}`);
-  }
-
-  return withdrawals;
-}
+import { optimizeRetirementWithdrawals } from "./optimizeRetirementWithdrawals";
+import { ICalculations, IResults } from "./types";
 
 export function optimizeAndSimulateRetirement(
   ssIncome: number,
@@ -174,7 +74,7 @@ export function optimizeAndSimulateRetirement(
     // Adjust **Social Security for COLA**
     ssIncome *= (1 + inflationRate);
 
-    years++;
+    const extraFromRMD = rmd - currentSpendingGoal - ssIncome
 
     // Store annual data
     annualDetails.push({
@@ -188,9 +88,13 @@ export function optimizeAndSimulateRetirement(
       ssIncome: Math.round(ssIncome),
       currentSpendingGoal: Math.round(currentSpendingGoal),
       taxesPaid: Math.round(withdrawals.taxesPaid),
-      medicareCosts: Math.round(medicareCost)
-    });
+      medicareCosts: Math.round(medicareCost),
+      requiredMinimumDistributions: Math.round(rmd),
+      extraFromRMD: Math.round(extraFromRMD > 0 ? extraFromRMD : 0 )
+      });
 
+      years++;
+      
     if (years > 40) {
       return {
         moneyLastYears: "more than 40",
