@@ -1,15 +1,20 @@
 import { getThresholds } from "./getTaxableSS";
 
-export function optimizeRetirementWithdrawals(ssIncome: number, rothBalance: number, tradBalance: number, spendingGoal: number, filingStatus: "single" | "married") {
+export function optimizeRothFirst(
+  rothBalance: number, 
+  tradBalance: number, 
+  spendingGoal: number,
+  ssIncome: number, 
+  provisionalIncome: number, 
+  filingStatus: "single" | "married") {
 
-  let provisionalIncome = ssIncome * 0.5; // Half of Social Security is counted for provisional income
   let taxableIncome = 0;
   let withdrawals = {
     fromRoth: 0,
     fromTrad: 0,
     taxesPaid: 0,
     ssIncome: ssIncome,
-    spendingGoal: spendingGoal
+    spendingGoal
   };
 
   // Step 1: Calculate remaining spending needed after Social Security

@@ -1,10 +1,10 @@
 import { calculateMedicareCosts } from "./calculateMedicare"
 import { calculateRMD } from "./calculateRMD"
 import { calculateYearlySocialSecurity } from "./calculateSocSec";
-import { optimizeRetirementWithdrawals } from "./optimizeRetirementWithdrawals";
 import { IAges, ICalculations, IResults } from "./types";
 
 export function optimizeAndSimulateRetirement(
+  optimizationStrategy: any,
   ages: IAges[],
   rothBalance: number,
   tradBalance: number,
@@ -24,14 +24,18 @@ export function optimizeAndSimulateRetirement(
     let currentAge = ages[0].retirementAge + years;
 
     let ssIncome = ages.reduce(
-      (accumulator: number, age: IAges) => accumulator + calculateYearlySocialSecurity(age, currentAge, years, inflationRate), 0);
+      (accumulator: number, age: IAges) => accumulator + calculateYearlySocialSecurity(
+        age, currentAge, years, inflationRate), 0);
 
+    let provisionalIncome = ssIncome * 0.5; // Half of Social Security is counted for provisional income
+    
     // Optimize withdrawals
-    let withdrawals = optimizeRetirementWithdrawals(
-      ssIncome,
+    let withdrawals = optimizationStrategy(
       currentRothBalance,
       currentTradBalance,
       currentSpendingGoal,
+      ssIncome,
+      provisionalIncome,
       filingStatus
     );
 

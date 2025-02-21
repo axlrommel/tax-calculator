@@ -5,6 +5,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import './App.css'
 import { optimizeAndSimulateRetirement } from "./tools/optimization";
 import { IAges, ICalculations } from "./tools/types";
+import { optimizeRothFirst } from "./tools/optimizeRothFirst";
+import { optimizeTraditionalFirst } from "./tools/optimizeTraditionalFirst";
+import { optimizeProportionally } from "./tools/optimizeProportionally";
+import { finalBalance, sumRequiredDistributions, totalTaxesPaid } from "./tools/utils";
 
 let USDollar = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -24,12 +28,27 @@ function App() {
   const [results, setResults] = useState<ICalculations[]>([]);
   const [yearsLast, setYearsLast] = useState<number | string>(0);
 
-  const calculateRetirement = () => {
-    const ages: IAges[] = [{retirementAge: retirementAgePrimary,ssClaimingAge: ssClaimAgePrimary}];
-    if(filingStatus === 'married') {
-      ages.push({retirementAge: retirementAgeSecondary,ssClaimingAge: ssClaimAgeSpouse})
+  const getAges = (): IAges[] => {
+    const ages: IAges[] = [{ retirementAge: retirementAgePrimary, ssClaimingAge: ssClaimAgePrimary }];
+    if (filingStatus === 'married') {
+      ages.push({ retirementAge: retirementAgeSecondary, ssClaimingAge: ssClaimAgeSpouse })
     }
-    let strategy = optimizeAndSimulateRetirement(ages, afterTax, beforeTax, spendingGoal, filingStatus);
+    return ages;
+  }
+  const useRothFirst = () => {
+    let strategy = optimizeAndSimulateRetirement(optimizeRothFirst, getAges(), afterTax, beforeTax, spendingGoal, filingStatus);
+    setResults(strategy.details);
+    setYearsLast(strategy.moneyLastYears);
+  }
+
+  const useTraditionalFirst = () => {
+    let strategy = optimizeAndSimulateRetirement(optimizeTraditionalFirst, getAges(), afterTax, beforeTax, spendingGoal, filingStatus);
+    setResults(strategy.details);
+    setYearsLast(strategy.moneyLastYears);
+  }
+
+  const useProportionally = () => {
+    let strategy = optimizeAndSimulateRetirement(optimizeProportionally, getAges(), afterTax, beforeTax, spendingGoal, filingStatus);
     setResults(strategy.details);
     setYearsLast(strategy.moneyLastYears);
   }
@@ -126,13 +145,23 @@ function App() {
           <label className="block text-sm font-medium">Annual Spending Goal ($)</label>
           <Input type="number" value={spendingGoal > 0 ? spendingGoal : ''} onChange={(e) => setSpendingGoal(Number(e.target.value))} />
         </div>
-        <Button onClick={calculateRetirement} className="w-64" disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}>
-          Calculate
+        <Button onClick={useRothFirst} className="w-64" disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}>
+          Optimize Roth First
+        </Button>
+        <Button onClick={useTraditionalFirst} className="w-64" disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}>
+          Optimize Trad First
+        </Button>
+        <Button onClick={useProportionally} className="w-64" disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}>
+          Optimize Proportional
         </Button>
         {yearsLast && (
           <div className="mt-6 p-4 border rounded-lg">
             <h3 className="text-lg font-semibold">Results</h3>
             <p>Money will last for: <strong>{yearsLast} years</strong></p>
+            <p>Total Taxes Paid: <strong>{USDollar.format(totalTaxesPaid(results))}</strong></p>
+            <p>Roth + IRA Balance at 40 years: <strong>{USDollar.format(finalBalance(results))}</strong></p>
+            <p>Total Forced Required Distributions: <strong>{USDollar.format(sumRequiredDistributions(results))}</strong></p>
+
             <div className="overflow-x-auto">
               <table className="w-full border-collapse border mt-4">
                 <thead>
