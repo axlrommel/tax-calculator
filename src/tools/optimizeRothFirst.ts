@@ -1,11 +1,11 @@
-import { getThresholds } from "./getTaxableSS";
+import { calculateTaxes } from "./calculateTaxes";
+import { getThresholds } from "./optimization";
 
 export function optimizeRothFirst(
   rothBalance: number, 
   tradBalance: number, 
   spendingGoal: number,
-  ssIncome: number, 
-  provisionalIncome: number, 
+  ssIncome: number,  
   filingStatus: "single" | "married") {
 
   let taxableIncome = 0;
@@ -13,9 +13,11 @@ export function optimizeRothFirst(
     fromRoth: 0,
     fromTrad: 0,
     taxesPaid: 0,
-    ssIncome: ssIncome,
+    ssIncome,
     spendingGoal
   };
+
+  let provisionalIncome = ssIncome * 0.5; // Half of ss income is counted for provisional income
 
   // Step 1: Calculate remaining spending needed after Social Security
   let remainingSpending = spendingGoal - ssIncome;
@@ -43,31 +45,16 @@ export function optimizeRothFirst(
     const threshold = getThresholds(filingStatus);
     let ssTaxable = 0;
     if (totalProvisionalIncome > threshold.ssBase2) {
-      ssTaxable = ssIncome * 0.85;
+      ssTaxable = 0.85 * (totalProvisionalIncome - threshold.ssBase2) + 0.5 * (threshold.ssBase2 - threshold.ssBase1);
     } else if (totalProvisionalIncome > threshold.ssBase1) {
-      ssTaxable = ssIncome * 0.5;
+      ssTaxable = 0.5 * (totalProvisionalIncome - threshold.ssBase1);
     }
 
     // Calculate total taxable income
     taxableIncome = ssTaxable + estimatedTradWithdrawal;
 
     // Calculate taxes
-    let tax = 0;
-    let taxRates = [0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37];
-    let taxBrackets = filingStatus === "married" ?
-      [23200, 94200, 201050, 383900, 470700, 628300]
-      : [11600, 47150, 100525, 191950, 243725, 609350];
-
-    let prevBracket = 0;
-    for (let i = 0; i < taxBrackets.length; i++) {
-      if (taxableIncome > prevBracket) {
-        let taxableAtRate = Math.min(taxableIncome, taxBrackets[i]) - prevBracket;
-        tax += taxableAtRate * taxRates[i];
-        prevBracket = taxBrackets[i];
-      } else {
-        break;
-      }
-    }
+    let tax = calculateTaxes(taxableIncome, filingStatus);
 
     // Total needed from Traditional IRA is remaining spending plus taxes
     let totalTradNeeded = remainingSpending + tax;

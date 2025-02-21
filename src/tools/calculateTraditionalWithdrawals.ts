@@ -1,5 +1,8 @@
 import { calculateTaxes } from "./calculateTaxes";
-import { getThresholds } from "./getTaxableSS";
+
+const getThresholds = (filingStatus: "single" | "married") => filingStatus === "married" ?
+  { ssBase1: 32000, ssBase2: 44000, taxBrackets: [23200, 94200] }
+  : { ssBase1: 25000, ssBase2: 34000, taxBrackets: [11600, 47150] };
 
 export function calculateTraditionalWithdrawals(
   amountNeeded: number,

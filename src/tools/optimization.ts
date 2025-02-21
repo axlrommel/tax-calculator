@@ -3,6 +3,10 @@ import { calculateRMD } from "./calculateRMD"
 import { calculateYearlySocialSecurity } from "./calculateSocSec";
 import { IAges, ICalculations, IResults } from "./types";
 
+export const getThresholds = (filingStatus: "single" | "married") => filingStatus === "married" ?
+  { ssBase1: 32000, ssBase2: 44000, taxBrackets: [23200, 94200] }
+  : { ssBase1: 25000, ssBase2: 34000, taxBrackets: [11600, 47150] };
+
 export function optimizeAndSimulateRetirement(
   optimizationStrategy: any,
   ages: IAges[],
@@ -27,15 +31,12 @@ export function optimizeAndSimulateRetirement(
       (accumulator: number, age: IAges) => accumulator + calculateYearlySocialSecurity(
         age, currentAge, years, inflationRate), 0);
 
-    let provisionalIncome = ssIncome * 0.5; // Half of Social Security is counted for provisional income
-    
     // Optimize withdrawals
     let withdrawals = optimizationStrategy(
       currentRothBalance,
       currentTradBalance,
       currentSpendingGoal,
       ssIncome,
-      provisionalIncome,
       filingStatus
     );
 
