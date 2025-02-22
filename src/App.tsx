@@ -184,8 +184,12 @@ function App() {
           <thead>
             <tr className="bg-gray-200">
               {["Year", "Age", "Roth Balance", "IRA Balance", "Roth Withdrawal", "IRA Withdrawal", 
-                "Req Min Distrib", "Spending Goal", "Total Withdrawn", "SS Income", 
-                "Extra from Req Min Distrib", "Taxes Paid", "Medicare Costs"].map(header => (
+                
+                // "Req Min Distrib", 
+                "Spending Goal", "Total Withdrawn", "SS Income", 
+                "Extra from Req Min Distrib", "Taxes Paid", 
+                // "Medicare Costs",
+              ].map(header => (
                 <th key={header} className="border p-2">{header}</th>
               ))}
             </tr>
@@ -199,13 +203,13 @@ function App() {
                 <td className="border p-2">{USDollar.format(row.tradBalance)}</td>
                 <td className="border p-2">{USDollar.format(row.withdrawalsFromRoth)}</td>
                 <td className="border p-2">{USDollar.format(row.withdrawalsFromTrad)}</td>
-                <td className="border p-2">{USDollar.format(row.requiredMinimumDistributions)}</td>
+                {/* <td className="border p-2">{USDollar.format(row.requiredMinimumDistributions)}</td> */}
                 <td className="border p-2">{USDollar.format(row.currentSpendingGoal)}</td>
                 <td className="border p-2">{USDollar.format(row.totalAmountWithdrawn)}</td>
                 <td className="border p-2">{USDollar.format(row.ssIncome)}</td>
                 <td className="border p-2">{USDollar.format(row.extraFromRMD)}</td>
                 <td className="border p-2">{USDollar.format(row.taxesPaid)}</td>
-                <td className="border p-2">{USDollar.format(row.medicareCosts)}</td>
+                {/* <td className="border p-2">{USDollar.format(row.medicareCosts)}</td> */}
               </tr>
             ))}
           </tbody>
