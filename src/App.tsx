@@ -76,7 +76,7 @@ function App() {
   {/* Primary Person: Retirement Age & SS Claim Age */}
   <div className="flex gap-6 mb-4">
     <div className="flex-1">
-      <label className="block text-sm font-medium">Retirement Age</label>
+      <label className="block text-sm font-medium">Your Retirement Age</label>
       <Select onValueChange={(value) => setRetirementAgePrimary(Number(value))}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select retirement age" />
@@ -90,7 +90,7 @@ function App() {
     </div>
 
     <div className="flex-1">
-      <label className="block text-sm font-medium">Social Security Claim Age</label>
+      <label className="block text-sm font-medium">Your Social Security Claim Age</label>
       <Select onValueChange={(value) => setSsClaimAgePrimary(Number(value))}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select age" />
@@ -140,19 +140,19 @@ function App() {
   {/* Investment Inputs */}
   <div className="flex gap-6 mb-4">
     <div className="flex-1">
-      <label className="block text-sm font-medium">After Tax Investments ($)</label>
+      <label className="block text-sm font-medium">After Tax Investments, e.g. Roth ($)</label>
       <Input type="number" value={afterTax > 0 ? afterTax : ''} onChange={(e) => setAfterTax(Number(e.target.value))} />
     </div>
 
     <div className="flex-1">
-      <label className="block text-sm font-medium">Before Tax Investments ($)</label>
+      <label className="block text-sm font-medium">Before Tax Investments, e.g. Traditional ($)</label>
       <Input type="number" value={beforeTax > 0 ? beforeTax : ''} onChange={(e) => setBeforeTax(Number(e.target.value))} />
     </div>
   </div>
 
   {/* Spending Goal */}
   <div className="mb-4">
-    <label className="block text-sm font-medium">Annual Spending Goal ($)</label>
+    <label className="block text-sm font-medium">Annual Spending Goal AFTER Taxes ($)</label>
     <Input type="number" value={spendingGoal > 0 ? spendingGoal : ''} onChange={(e) => setSpendingGoal(Number(e.target.value))} />
   </div>
 
@@ -183,11 +183,13 @@ function App() {
         <table className="w-full border-collapse border">
           <thead>
             <tr className="bg-gray-200">
-              {["Year", "Age", "Roth Balance", "IRA Balance", "Roth Withdrawal", "IRA Withdrawal", 
-                
+              {["Year", "Age", "Ending Roth Balance", "Ending IRA Balance", 
+              // "Roth Withdrawal", 
+              // "IRA Withdrawal", 
                 // "Req Min Distrib", 
-                "Spending Goal", "Total Withdrawn", "SS Income", 
-                "Extra from Req Min Distrib", "Taxes Paid", 
+                "Spending Goal After Tax", "Total Withdrawn", "SS Income", 
+                // "Extra from Req Min Distrib", 
+                "Taxes Paid", 
                 // "Medicare Costs",
               ].map(header => (
                 <th key={header} className="border p-2">{header}</th>
@@ -201,13 +203,13 @@ function App() {
                 <td className="border p-2">{row.age}</td>
                 <td className="border p-2">{USDollar.format(row.rothBalance)}</td>
                 <td className="border p-2">{USDollar.format(row.tradBalance)}</td>
-                <td className="border p-2">{USDollar.format(row.withdrawalsFromRoth)}</td>
-                <td className="border p-2">{USDollar.format(row.withdrawalsFromTrad)}</td>
+                {/* <td className="border p-2">{USDollar.format(row.withdrawalsFromRoth)}</td> */}
+                {/* <td className="border p-2">{USDollar.format(row.withdrawalsFromTrad)}</td> */}
                 {/* <td className="border p-2">{USDollar.format(row.requiredMinimumDistributions)}</td> */}
                 <td className="border p-2">{USDollar.format(row.currentSpendingGoal)}</td>
                 <td className="border p-2">{USDollar.format(row.totalAmountWithdrawn)}</td>
                 <td className="border p-2">{USDollar.format(row.ssIncome)}</td>
-                <td className="border p-2">{USDollar.format(row.extraFromRMD)}</td>
+                {/* <td className="border p-2">{USDollar.format(row.extraFromRMD)}</td> */}
                 <td className="border p-2">{USDollar.format(row.taxesPaid)}</td>
                 {/* <td className="border p-2">{USDollar.format(row.medicareCosts)}</td> */}
               </tr>
