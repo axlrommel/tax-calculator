@@ -21,7 +21,7 @@ export function optimizeTraditionalFirst(
 
   // Step 1: Withdraw from Traditional IRA first (taxable)
   if (tradBalance > 0 && remainingSpending > 0) {
-    let estimatedTradWithdrawal = remainingSpending;
+    let estimatedTradWithdrawal = tradBalance > remainingSpending ? remainingSpending : tradBalance;
     let totalProvisionalIncome = provisionalIncome + estimatedTradWithdrawal;
 
     // Step 2: Calculate taxable portion of Social Security
@@ -39,6 +39,7 @@ export function optimizeTraditionalFirst(
 
     // Step 4: Calculate progressive tax
     let tax = calculateTaxes(taxableIncome, filingStatus);
+    console.log(taxableIncome, tax, ssTaxable);
 
     // Step 5: Adjust Traditional IRA withdrawal to cover taxes
     let totalTradNeeded = remainingSpending + tax;
