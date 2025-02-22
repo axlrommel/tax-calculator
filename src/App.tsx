@@ -55,12 +55,12 @@ function App() {
 
     return (
 <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg m-4">
-  <h2 className="text-2xl font-bold mb-6">Retirement Calculator</h2>
+  <h2 className="text-2xl font-bold mb-6">Retirement Calculator for the US</h2>
 
   {/* Filing Status */}
   <div className="flex gap-6 mb-4">
     <div className="flex-1">
-      <label className="block text-sm font-medium">Filing Status</label>
+      <label className="block text-sm font-medium">Your Filing Status</label>
       <Select onValueChange={(value) => setFilingStatus(value as "single" | "married")}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select your status" />
