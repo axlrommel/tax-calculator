@@ -29,7 +29,7 @@ export function optimizeAndSimulateRetirement(
 
     let ssIncome = ages.reduce(
       (accumulator: number, age: IAges) => accumulator + calculateYearlySocialSecurity(
-        age, currentAge, years, inflationRate), 0);
+        age.ssClaimingAge, currentAge, years, inflationRate), 0);
 
     // Optimize withdrawals
     let withdrawals = optimizationStrategy(
