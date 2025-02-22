@@ -1,6 +1,24 @@
 import { calculateTaxes } from "./calculateTaxes";
 import { getThresholds } from "./optimization";
 
+const getTaxes = (filingStatus: "single" | "married", totalProvisionalIncome: number, tradWithdrawal: number): number => {
+  // Step 1: Calculate taxable portion of Social Security
+  const { ssBase1, ssBase2 } = getThresholds(filingStatus);
+  let ssTaxable = 0;
+
+  if (totalProvisionalIncome > ssBase2) {
+    ssTaxable = 0.85 * (totalProvisionalIncome - ssBase2) + 0.5 * (ssBase2 - ssBase1);
+  } else if (totalProvisionalIncome > ssBase1) {
+    ssTaxable = 0.5 * (totalProvisionalIncome - ssBase1);
+  }
+
+  // Step 2: Compute taxable income
+  let taxableIncome = ssTaxable + tradWithdrawal;
+
+  // Step 3: Calculate actual taxes using progressive tax brackets
+  return calculateTaxes(taxableIncome, filingStatus);
+}
+
 export function optimizeProportionally(
   rothBalance: number,
   tradBalance: number,
@@ -22,6 +40,18 @@ export function optimizeProportionally(
 
   if (totalBalance === 0) return withdrawals;
 
+  if(remainingSpending < 0) {
+    withdrawals.taxesPaid = getTaxes(filingStatus, provisionalIncome, 0);
+    return withdrawals;
+  }
+
+  if(totalBalance < remainingSpending) {
+    withdrawals.fromTrad = tradBalance;
+    withdrawals.fromRoth = rothBalance;
+    withdrawals.taxesPaid = getTaxes(filingStatus, provisionalIncome + tradBalance, tradBalance);
+    return withdrawals;
+  }
+
   // Determine proportional withdrawals
   let rothPercentage = rothBalance / totalBalance;
   let tradPercentage = tradBalance / totalBalance;
@@ -32,21 +62,7 @@ export function optimizeProportionally(
   // Compute total provisional income
   let totalProvisionalIncome = provisionalIncome + tradWithdrawal;
 
-  // Step 1: Calculate taxable portion of Social Security
-  const { ssBase1, ssBase2 } = getThresholds(filingStatus);
-  let ssTaxable = 0;
-
-  if (totalProvisionalIncome > ssBase2) {
-    ssTaxable = 0.85 * (totalProvisionalIncome - ssBase2) + 0.5 * (ssBase2 - ssBase1);
-  } else if (totalProvisionalIncome > ssBase1) {
-    ssTaxable = 0.5 * (totalProvisionalIncome - ssBase1);
-  }
-
-  // Step 2: Compute taxable income
-  let taxableIncome = ssTaxable + tradWithdrawal;
-
-  // Step 3: Calculate actual taxes using progressive tax brackets
-  let taxesPaid = calculateTaxes(taxableIncome, filingStatus);
+  const taxesPaid = getTaxes(filingStatus, totalProvisionalIncome, tradWithdrawal)
 
   // Adjust Traditional IRA withdrawal to cover taxes
   let totalTradNeeded = tradWithdrawal + taxesPaid;

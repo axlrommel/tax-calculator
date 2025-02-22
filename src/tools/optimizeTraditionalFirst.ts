@@ -39,7 +39,6 @@ export function optimizeTraditionalFirst(
 
     // Step 4: Calculate progressive tax
     let tax = calculateTaxes(taxableIncome, filingStatus);
-    console.log(taxableIncome, tax, ssTaxable);
 
     // Step 5: Adjust Traditional IRA withdrawal to cover taxes
     let totalTradNeeded = remainingSpending + tax;
