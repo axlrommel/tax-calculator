@@ -22,4 +22,5 @@ export interface IResults {
 export interface IAges {
   retirementAge: number;
   ssClaimingAge: number;
+  currentAge: number;
 }

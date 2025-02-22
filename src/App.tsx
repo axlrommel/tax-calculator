@@ -18,6 +18,8 @@ let USDollar = new Intl.NumberFormat('en-US', {
 
 function App() {
   const [filingStatus, setFilingStatus] = useState<"single" | "married">("single");
+  const [currentAge, setCurrentAge] = useState<number>(30); // New state for current age
+  const [spouseCurrentAge, setSpouseCurrentAge] = useState<number>(30); // New state for spouse's current age
   const [retirementAgePrimary, setRetirementAgePrimary] = useState<number>(65);
   const [retirementAgeSecondary, setRetirementAgeSecondary] = useState<number>(65);
   const [ssClaimAgePrimary, setSsClaimAgePrimary] = useState<number>(65);
@@ -29,9 +31,9 @@ function App() {
   const [yearsLast, setYearsLast] = useState<number | string>(0);
 
   const getAges = (): IAges[] => {
-    const ages: IAges[] = [{ retirementAge: retirementAgePrimary, ssClaimingAge: ssClaimAgePrimary }];
+    const ages: IAges[] = [{ currentAge , retirementAge: retirementAgePrimary, ssClaimingAge: ssClaimAgePrimary }];
     if (filingStatus === 'married') {
-      ages.push({ retirementAge: retirementAgeSecondary, ssClaimingAge: ssClaimAgeSpouse });
+      ages.push({ currentAge: spouseCurrentAge, retirementAge: retirementAgeSecondary, ssClaimingAge: ssClaimAgeSpouse });
     }
     return ages;
   };
@@ -72,6 +74,32 @@ function App() {
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* Current Age */}
+      <div className="flex gap-6 mb-6">
+        <div className="w-1/2">
+          <label className="block text-sm font-medium mb-2">Your Current Age</label>
+          <Input
+            type="number"
+            value={currentAge > 0 ? currentAge : ''}
+            onChange={(e) => setCurrentAge(Number(e.target.value))}
+            className="w-full max-w-[200px]"
+          />
+        </div>
+
+        {/* Spouse Current Age (Only if Married) */}
+        {filingStatus === "married" && (
+          <div className="w-1/2">
+            <label className="block text-sm font-medium mb-2">Spouse's Current Age</label>
+            <Input
+              type="number"
+              value={spouseCurrentAge > 0 ? spouseCurrentAge : ''}
+              onChange={(e) => setSpouseCurrentAge(Number(e.target.value))}
+              className="w-full max-w-[200px]"
+            />
+          </div>
+        )}
       </div>
 
       {/* Primary Person: Retirement Age & SS Claim Age */}
@@ -142,19 +170,34 @@ function App() {
       <div className="flex gap-6 mb-6">
         <div className="w-1/2">
           <label className="block text-sm font-medium mb-2">After Tax Investments, e.g. Roth ($)</label>
-          <Input type="number" value={afterTax > 0 ? afterTax : ''} onChange={(e) => setAfterTax(Number(e.target.value))} className="w-full max-w-[200px]" />
+          <Input
+            type="number"
+            value={afterTax > 0 ? afterTax : ''}
+            onChange={(e) => setAfterTax(Number(e.target.value))}
+            className="w-full max-w-[200px]"
+          />
         </div>
 
         <div className="w-1/2">
           <label className="block text-sm font-medium mb-2">Before Tax Investments, e.g. Traditional ($)</label>
-          <Input type="number" value={beforeTax > 0 ? beforeTax : ''} onChange={(e) => setBeforeTax(Number(e.target.value))} className="w-full max-w-[200px]" />
+          <Input
+            type="number"
+            value={beforeTax > 0 ? beforeTax : ''}
+            onChange={(e) => setBeforeTax(Number(e.target.value))}
+            className="w-full max-w-[200px]"
+          />
         </div>
       </div>
 
       {/* Spending Goal */}
       <div className="mb-6">
         <label className="block text-sm font-medium mb-2">Annual Spending Goal AFTER Taxes ($)</label>
-        <Input type="number" value={spendingGoal > 0 ? spendingGoal : ''} onChange={(e) => setSpendingGoal(Number(e.target.value))} className="w-full max-w-[200px]" />
+        <Input
+          type="number"
+          value={spendingGoal > 0 ? spendingGoal : ''}
+          onChange={(e) => setSpendingGoal(Number(e.target.value))}
+          className="w-full max-w-[200px]"
+        />
       </div>
 
       {/* Optimization Buttons */}
