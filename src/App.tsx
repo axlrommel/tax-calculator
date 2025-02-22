@@ -17,9 +17,10 @@ let USDollar = new Intl.NumberFormat('en-US', {
 });
 
 function App() {
+  const [selection, setSelection] = useState<string>('');
   const [filingStatus, setFilingStatus] = useState<"single" | "married">("single");
-  const [currentAge, setCurrentAge] = useState<number>(30); // New state for current age
-  const [spouseCurrentAge, setSpouseCurrentAge] = useState<number>(30); // New state for spouse's current age
+  const [currentAge, setCurrentAge] = useState<number>(55); // New state for current age
+  const [spouseCurrentAge, setSpouseCurrentAge] = useState<number>(55); // New state for spouse's current age
   const [retirementAgePrimary, setRetirementAgePrimary] = useState<number>(65);
   const [retirementAgeSecondary, setRetirementAgeSecondary] = useState<number>(65);
   const [ssClaimAgePrimary, setSsClaimAgePrimary] = useState<number>(65);
@@ -42,18 +43,21 @@ function App() {
     let strategy = optimizeAndSimulateRetirement(optimizeRothFirst, getAges(), afterTax, beforeTax, spendingGoal, filingStatus);
     setResults(strategy.details);
     setYearsLast(strategy.moneyLastYears);
+    setSelection('Roth First Strategy')
   };
 
   const useTraditionalFirst = () => {
     let strategy = optimizeAndSimulateRetirement(optimizeTraditionalFirst, getAges(), afterTax, beforeTax, spendingGoal, filingStatus);
     setResults(strategy.details);
     setYearsLast(strategy.moneyLastYears);
+    setSelection('Traditional First Strategy')
   };
 
   const useProportionally = () => {
     let strategy = optimizeAndSimulateRetirement(optimizeProportionally, getAges(), afterTax, beforeTax, spendingGoal, filingStatus);
     setResults(strategy.details);
     setYearsLast(strategy.moneyLastYears);
+    setSelection('Proportional Strategy')
   };
 
   return (
@@ -216,8 +220,8 @@ function App() {
       {/* Results Section */}
       {yearsLast != 0 && (
         <div className="p-6 border rounded-lg bg-gray-50">
-          <h3 className="text-lg font-semibold mb-4 text-center">Results</h3>
-          <div className="space-y-2 mb-4">
+          <h3 className="text-lg font-semibold mb-4 text-center">{selection}</h3>
+          <div className="space-y-2">
             <p className="text-sm">Money will last for: <strong>{yearsLast} years</strong></p>
             <p className="text-sm">Total Taxes Paid: <strong>{USDollar.format(totalTaxesPaid(results))}</strong></p>
             <p className="text-sm">Roth + IRA Balance at 40 years: <strong>{USDollar.format(finalBalance(results))}</strong></p>
@@ -229,7 +233,7 @@ function App() {
             <table className="w-full border-collapse border">
               <thead>
                 <tr className="bg-gray-200">
-                  {["Year", "Age", "Ending Roth Balance", "Ending IRA Balance", "Spending Goal After Tax", "Total Withdrawn", "SS Income", "Taxes Paid"].map(header => (
+                  {["Retirement Year", "Your Age", "Ending Roth Balance", "Ending IRA Balance", "Spending Goal After Tax", "Total Withdrawn", "SS Income", "Taxes Paid"].map(header => (
                     <th key={header} className="border p-2 text-center">{header}</th>
                   ))}
                 </tr>
