@@ -113,15 +113,3 @@ export function optimizeAndSimulateRetirement(
     details: annualDetails
   };
 }
-
-// // Example Usage:
-// let claimingAge = [65, 62];    // Age at which person claims benefits
-// let filingStatus = claimingAge.length === 1 ? "single" : "married";
-// let ssIncome = claimingAge.reduce((prev, curr) => prev + calculateYearlySocialSecurity(curr),0);
-
-// let rothBalance = 200000; // Roth IRA Balance
-// let tradBalance = 2200000; // Traditional IRA Balance
-// let spendingGoal = 150000; // Annual Spending Needs
-
-// let strategy = optimizeAndSimulateRetirement(ssIncome, rothBalance, tradBalance, spendingGoal, filingStatus);
-// console.log(strategy);
