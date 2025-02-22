@@ -58,7 +58,7 @@ function App() {
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg m-4">
-      <h2 className="text-2xl font-bold mb-8 text-center">Retirement Calculator for the US</h2>
+      <h2 className="text-2xl font-bold mb-8 text-center">Retirement Tax Calculator for the US</h2>
 
       {/* Filing Status */}
       <div className="flex gap-6 mb-6">
@@ -214,7 +214,7 @@ function App() {
       </div>
 
       {/* Results Section */}
-      {yearsLast && (
+      {yearsLast != 0 && (
         <div className="p-6 border rounded-lg bg-gray-50">
           <h3 className="text-lg font-semibold mb-4 text-center">Results</h3>
           <div className="space-y-2 mb-4">
