@@ -51,7 +51,7 @@ function App() {
             <SelectTrigger className="w-full max-w-[200px]">
               <SelectValue placeholder="Select your status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-50 absolute bg-white shadow-lg">
               <SelectItem value="single">Single</SelectItem>
               <SelectItem value="married">Married</SelectItem>
             </SelectContent>
@@ -87,7 +87,7 @@ function App() {
             <SelectTrigger className="w-full max-w-[200px]">
               <SelectValue placeholder="Select retirement age" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-50 absolute bg-white shadow-lg">
               {Array.from({ length: 20 }, (_, i) => 55 + i).map((age) => (
                 <SelectItem key={age} value={age.toString()}>{age}</SelectItem>
               ))}
@@ -100,7 +100,7 @@ function App() {
             <SelectTrigger className="w-full max-w-[200px]">
               <SelectValue placeholder="Select age" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-50 absolute bg-white shadow-lg">
               {Array.from({ length: 10 }, (_, i) => 62 + i).map((age) => (
                 <SelectItem key={age} value={age.toString()}>{age}</SelectItem>
               ))}
@@ -116,7 +116,7 @@ function App() {
               <SelectTrigger className="w-full max-w-[200px]">
                 <SelectValue placeholder="Select spouse's retirement age" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-50 absolute bg-white shadow-lg">
                 {Array.from({ length: 20 }, (_, i) => 55 + i).map((age) => (
                   <SelectItem key={age} value={age.toString()}>{age}</SelectItem>
                 ))}
@@ -129,7 +129,7 @@ function App() {
               <SelectTrigger className="w-full max-w-[200px]">
                 <SelectValue placeholder="Select age" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-50 absolute bg-white shadow-lg">
                 {Array.from({ length: 10 }, (_, i) => 62 + i).map((age) => (
                   <SelectItem key={age} value={age.toString()}>{age}</SelectItem>
                 ))}
