@@ -140,7 +140,7 @@ function App() {
       )}
       <div className="flex gap-6 mb-6">
         <div className="w-1/2">
-          <label className="block text-sm font-medium mb-2">After Tax Investments, e.g. Roth ($)</label>
+          <label className="block text-sm font-medium mb-2">After Tax Investments At Retirement, e.g. Roth ($)</label>
           <Input
             type="number"
             value={afterTax > 0 ? afterTax : ''}
@@ -149,7 +149,7 @@ function App() {
           />
         </div>
         <div className="w-1/2">
-          <label className="block text-sm font-medium mb-2">Before Tax Investments, e.g. Traditional ($)</label>
+          <label className="block text-sm font-medium mb-2">Before Tax Investments At Retirement, e.g. Traditional ($)</label>
           <Input
             type="number"
             value={beforeTax > 0 ? beforeTax : ''}

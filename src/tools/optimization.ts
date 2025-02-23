@@ -24,12 +24,14 @@ export function optimizeAndSimulateRetirement(
   let annualDetails = [] as ICalculations[];
   let medicareCost = 0;
 
+  const yearsPassed = ages[0].retirementAge -  ages[0].currentAge;
+
   while (currentRothBalance + currentTradBalance > 0) {
     let currentAge = ages[0].retirementAge + years;
 
     let ssIncome = ages.reduce(
       (accumulator: number, age: IAges) => accumulator + calculateYearlySocialSecurity(
-        age.ssClaimingAge, currentAge, years, inflationRate), 0);
+        age.ssClaimingAge, currentAge, yearsPassed + years, inflationRate), 0);
 
     // Optimize withdrawals
     let withdrawals = optimizationStrategy(
@@ -50,7 +52,7 @@ export function optimizeAndSimulateRetirement(
 
     // Update **Medicare costs** based on taxable income
     if (currentAge >= 65) {
-      medicareCost = calculateMedicareCosts(withdrawals.fromTrad, filingStatus, years);
+      medicareCost = calculateMedicareCosts(withdrawals.fromTrad, filingStatus, yearsPassed + years);
       if (filingStatus === 'married') {
         medicareCost *= 2; //if married then we need to account for both spouses
       }
@@ -79,7 +81,7 @@ export function optimizeAndSimulateRetirement(
 
     // Store annual data
     annualDetails.push({
-      year: years,
+      year: new Date().getFullYear() + yearsPassed + years,
       age: currentAge,
       rothBalance: Math.round(currentRothBalance),
       tradBalance: Math.round(currentTradBalance),
