@@ -167,17 +167,29 @@ function App() {
           className="w-full max-w-[200px]"
         />
       </div>
-      <div className="flex gap-4 mb-8">
-        <Button onClick={() => doCalculations(optimizeRothFirst, 'Roth First Strategy')} className="flex-1" disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}>
-          Optimize Roth First
-        </Button>
-        <Button onClick={() => doCalculations(optimizeTraditionalFirst, 'Traditional First Strategy')} className="flex-1" disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}>
-          Optimize Trad First
-        </Button>
-        <Button onClick={() => doCalculations(optimizeProportionally, 'Proportional Strategy')} className="flex-1" disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}>
-          Optimize Proportional
-        </Button>
-      </div>
+      <div className="flex flex-wrap gap-4 mb-8">
+  <Button
+    onClick={() => doCalculations(optimizeRothFirst, 'Roth First Strategy')}
+    className="flex-1 min-w-[150px] basis-full sm:basis-auto"
+    disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}
+  >
+    Optimize Roth First
+  </Button>
+  <Button
+    onClick={() => doCalculations(optimizeTraditionalFirst, 'Traditional First Strategy')}
+    className="flex-1 min-w-[150px] basis-full sm:basis-auto"
+    disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}
+  >
+    Optimize Trad First
+  </Button>
+  <Button
+    onClick={() => doCalculations(optimizeProportionally, 'Proportional Strategy')}
+    className="flex-1 min-w-[150px] basis-full sm:basis-auto"
+    disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}
+  >
+    Optimize Proportional
+  </Button>
+</div>
       {yearsLast != 0 && (
         <ResultsSection results={results} selection={selection} yearsLast={yearsLast} />
       )}
