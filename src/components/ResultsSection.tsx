@@ -17,6 +17,8 @@ interface IProps {
 function ResultsSection(props: IProps) {
   const [showMedicare, setShowMedicare] = useState<boolean>(false);
   const [showRMD, setShowRMD] = useState<boolean>(false);
+  const [showForcedRMD, setShowForcedRMD] = useState<boolean>(false);
+  const [showWithdrawals, setShowWithdrawals] = useState<boolean>(false);
 
   const getColumnLabels = (): string[] => {
     let labels = ["Year", "Your Age", "Ending Roth Balance", "Ending IRA Balance", "Spending Goal After Tax", "Total Withdrawn", "SS Income", "Taxes Paid"];
@@ -25,6 +27,13 @@ function ResultsSection(props: IProps) {
     }
     if(showRMD) {
       labels.push("Required Minimum Distributions")
+    }
+    if(showWithdrawals) {
+      labels.push("Withdrawals from Roth");
+      labels.push("Withdrawals from Traditional")
+    }
+    if(showForcedRMD) {
+      labels.push("Forced Required Distributions");
     }
     return labels;
   }
@@ -66,6 +75,24 @@ function ResultsSection(props: IProps) {
             />
             <span className="text-base">Show Required Minimum Distributions</span>
           </label>
+          <label className="flex items-center space-x-3">
+            <input
+              type="checkbox"
+              checked={showWithdrawals}
+              onChange={() => setShowWithdrawals(!showWithdrawals)}
+              className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
+            />
+            <span className="text-base">Show Withdrawals</span>
+          </label>
+          <label className="flex items-center space-x-3">
+            <input
+              type="checkbox"
+              checked={showForcedRMD}
+              onChange={() => setShowForcedRMD(!showForcedRMD)}
+              className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
+            />
+            <span className="text-base">Show Forced Required Minimum Distributions</span>
+          </label>
         </div>
       </div>
 
@@ -91,6 +118,9 @@ function ResultsSection(props: IProps) {
                 <td className="border p-4 text-center">{USDollar.format(row.taxesPaid)}</td>
                 {showMedicare && <td className="border p-4 text-center">{USDollar.format(row.medicareCosts)}</td>}
                 {showRMD && <td className="border p-4 text-center">{USDollar.format(row.requiredMinimumDistributions)}</td>}
+                {showWithdrawals && <td className="border p-4 text-center">{USDollar.format(row.withdrawalsFromRoth)}</td>}
+                {showWithdrawals && <td className="border p-4 text-center">{USDollar.format(row.withdrawalsFromTrad)}</td>}
+                {showForcedRMD && <td className="border p-4 text-center">{USDollar.format(row.extraFromRMD)}</td>}
               </tr>
             ))}
           </tbody>
