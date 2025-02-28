@@ -1,5 +1,5 @@
 import { calculateTaxes } from "./calculateTaxes";
-import { getThresholds } from "./optimization";
+import { getThresholds } from "./constants";
 
 export function optimizeTraditionalFirst(
   rothBalance: number,

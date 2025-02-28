@@ -1,5 +1,5 @@
 import { calculateTaxes } from "./calculateTaxes";
-import { getThresholds } from "./optimization";
+import { getThresholds } from "./constants";
 
 const getTaxes = (filingStatus: "single" | "married", totalProvisionalIncome: number, tradWithdrawal: number): number => {
   // Step 1: Calculate taxable portion of Social Security

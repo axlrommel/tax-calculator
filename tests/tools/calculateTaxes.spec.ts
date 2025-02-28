@@ -29,8 +29,8 @@ describe('calculateTaxes', () => {
     const income = 250000;
     const filingStatus = 'married';
     const tax = calculateTaxes(income, filingStatus);
-    // Calculation: (23200 * 0.1) + ((94200 - 23200) * 0.12) + ((201050 - 94200) * 0.22) + ((250000 - 201050) * 0.24)
-    expect(tax).toBe(2320 + (71000 * 0.12) + (106850 * 0.22) + (48950 * 0.24));
+    // Calculation: (23200 * 0.1) + ((94300 - 23200) * 0.12) + ((201050 - 94300) * 0.22) + ((250000 - 201050) * 0.24)
+    expect(tax).toBe(2320 + (71100 * 0.12) + (106750 * 0.22) + (48950 * 0.24));
   });
 
   it('should calculate taxes for single filer exceeding the highest bracket', () => {
@@ -45,8 +45,8 @@ describe('calculateTaxes', () => {
     const income = 800000;
     const filingStatus = 'married';
     const tax = calculateTaxes(income, filingStatus);
-    // Calculation: (23200 * 0.1) + ((94200 - 23200) * 0.12) + ((201050 - 94200) * 0.22) + ((383900 - 201050) * 0.24) + ((470700 - 383900) * 0.32) + ((628300 - 470700) * 0.35) + ((800000 - 628300) * 0.37)
-    expect(tax).toBe(2320 + (71000 * 0.12) + (106850 * 0.22) + (182850 * 0.24) + (86800 * 0.32) + (157600 * 0.35) + (171700 * 0.37));
+    // Calculation: (23200 * 0.1) + ((94300 - 23200) * 0.12) + ((201050 - 94300) * 0.22) + ((383900 - 201050) * 0.24) + ((487450 - 383900) * 0.32) + ((731200 - 487450) * 0.35) + ((800000 - 731200) * 0.37)
+    expect(tax).toBe(2320 + (71100 * 0.12) + (106750 * 0.22) + (182850 * 0.24) + (103550 * 0.32) + (243750 * 0.35) + (68800 * 0.37));
   });
 
   it('should return 0 for zero income', () => {
