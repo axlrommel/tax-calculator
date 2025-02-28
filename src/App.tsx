@@ -22,6 +22,8 @@ function App() {
   const [ssClaimAgeSpouse, setSsClaimAgeSpouse] = useState<number>(65);
   const [afterTax, setAfterTax] = useState(0);
   const [beforeTax, setBeforeTax] = useState(0);
+  const [inflationRate, setInflationRate] = useState<number>(2);
+  const [investmentReturn, setInvestmentReturn] = useState<number>(5);
   const [spendingGoal, setSpendingGoal] = useState(0);
   const [results, setResults] = useState<ICalculations[]>([]);
   const [yearsLast, setYearsLast] = useState<number | string>(0);
@@ -35,7 +37,8 @@ function App() {
   };
 
   const doCalculations = (fn: any, strategyTxt: string) => {
-    let strategy = optimizeAndSimulateRetirement(fn, getAges(), afterTax, beforeTax, spendingGoal, filingStatus);
+    let strategy = optimizeAndSimulateRetirement(fn, getAges(), afterTax, beforeTax, spendingGoal, 
+    filingStatus, investmentReturn/100, inflationRate/100);
     setResults(strategy.details);
     setYearsLast(strategy.moneyLastYears);
     setSelection(strategyTxt)
@@ -167,29 +170,58 @@ function App() {
           className="w-full max-w-[200px]"
         />
       </div>
+      {/* Inflation Rate Slider */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium mb-2">
+          Yearly Inflation Rate: <strong>{inflationRate}%</strong>
+        </label>
+        <input
+          type="range"
+          min="1"
+          max="4"
+          step="1"
+          value={inflationRate}
+          onChange={(e) => setInflationRate(Number(e.target.value))}
+          className="w-full max-w-[200px]"
+        />
+      </div>
+      <div className="w-1/3">
+          <label className="block text-sm font-medium mb-2">
+            Investment Return: <strong>{investmentReturn}%</strong>
+          </label>
+          <input
+            type="range"
+            min="3"
+            max="9"
+            step="1"
+            value={investmentReturn}
+            onChange={(e) => setInvestmentReturn(Number(e.target.value))}
+            className="w-full max-w-[200px]"
+          />
+        </div>
       <div className="flex flex-wrap gap-4 mb-8">
-  <Button
-    onClick={() => doCalculations(optimizeRothFirst, 'Roth First Strategy')}
-    className="flex-1 min-w-[150px] basis-full sm:basis-auto"
-    disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}
-  >
-    Optimize Roth First
-  </Button>
-  <Button
-    onClick={() => doCalculations(optimizeTraditionalFirst, 'Traditional First Strategy')}
-    className="flex-1 min-w-[150px] basis-full sm:basis-auto"
-    disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}
-  >
-    Optimize Trad First
-  </Button>
-  <Button
-    onClick={() => doCalculations(optimizeProportionally, 'Proportional Strategy')}
-    className="flex-1 min-w-[150px] basis-full sm:basis-auto"
-    disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}
-  >
-    Optimize Proportional
-  </Button>
-</div>
+        <Button
+          onClick={() => doCalculations(optimizeRothFirst, 'Roth First Strategy')}
+          className="flex-1 min-w-[150px] basis-full sm:basis-auto"
+          disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}
+        >
+          Optimize Roth First
+        </Button>
+        <Button
+          onClick={() => doCalculations(optimizeTraditionalFirst, 'Traditional First Strategy')}
+          className="flex-1 min-w-[150px] basis-full sm:basis-auto"
+          disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}
+        >
+          Optimize Trad First
+        </Button>
+        <Button
+          onClick={() => doCalculations(optimizeProportionally, 'Proportional Strategy')}
+          className="flex-1 min-w-[150px] basis-full sm:basis-auto"
+          disabled={(afterTax < 1 && beforeTax < 1) || spendingGoal < 1}
+        >
+          Optimize Proportional
+        </Button>
+      </div>
       {yearsLast != 0 && (
         <ResultsSection results={results} selection={selection} yearsLast={yearsLast} />
       )}
