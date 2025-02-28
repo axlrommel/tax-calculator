@@ -33,7 +33,7 @@ describe("optimizeRothFirst", () => {
   it("should withdraw from Traditional IRA when Roth is insufficient", () => {
     const result = optimizeRothFirst(5000, 50000, 40000, 20000, "single");
     expect(result.fromRoth).toBe(5000);
-    expect(result.fromTrad).toBe(16500); // 15,000 + 10% tax = $16500
+    expect(result.fromTrad).toBe(15000);
     expect(result.taxesPaid).toBe(1500);
   });
 

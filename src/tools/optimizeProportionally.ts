@@ -65,8 +65,7 @@ export function optimizeProportionally(
   const taxesPaid = getTaxes(filingStatus, totalProvisionalIncome, tradWithdrawal)
 
   // Adjust Traditional IRA withdrawal to cover taxes
-  let totalTradNeeded = tradWithdrawal + taxesPaid;
-  withdrawals.fromTrad = Math.min(totalTradNeeded, tradBalance);
+  withdrawals.fromTrad = Math.min(tradWithdrawal, tradBalance);
   withdrawals.taxesPaid = taxesPaid;
 
   // Ensure Roth withdrawals do not exceed balance

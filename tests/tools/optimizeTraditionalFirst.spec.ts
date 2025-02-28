@@ -18,7 +18,7 @@ vi.mock("../../src/tools/optimization", () => ({
 describe("optimizeTraditionalFirst", () => {
   it("should withdraw from Traditional IRA first if balance is sufficient", () => {
     const result = optimizeTraditionalFirst(50000, 100000, 40000, 20000, "single");
-    expect(result.fromTrad).toBe(22250); //taxes + spending goal
+    expect(result.fromTrad).toBe(20000); //spending goal
     expect(result.fromRoth).toBe(0);
     expect(result.taxesPaid).toBe(2250); // 10% tax on $20000 (ira withdrawl) + 2500 (ss taxable)
   });
@@ -26,7 +26,7 @@ describe("optimizeTraditionalFirst", () => {
   it("should withdraw from Roth only if Traditional IRA is insufficient", () => {
     const result = optimizeTraditionalFirst(50000, 10000, 40000, 20000, "single");
     expect(result.fromTrad).toBe(10000);
-    expect(result.fromRoth).toBe(11000); // Remaining amount: 40K - 20K - 10K + 1K for tax
+    expect(result.fromRoth).toBe(10000); // Remaining amount: 40K - 20K - 10K
     expect(result.taxesPaid).toBe(1000); // 1K tax on $10k from ira
   });
 

@@ -56,18 +56,9 @@ export function optimizeRothFirst(
     // Calculate taxes
     let tax = calculateTaxes(taxableIncome, filingStatus);
 
-    // Total needed from Traditional IRA is remaining spending plus taxes
-    let totalTradNeeded = remainingSpending + tax;
-    withdrawals.fromTrad = Math.min(totalTradNeeded, tradBalance);
+    // Total needed from Traditional IRA is remaining spending
+    withdrawals.fromTrad = Math.min(remainingSpending, tradBalance);
     withdrawals.taxesPaid = tax;
-  }
-
-  // Calculate final numbers
-  let totalWithdrawn = ssIncome + withdrawals.fromRoth + withdrawals.fromTrad - withdrawals.taxesPaid;
-
-  // Verify we meet spending goal (within rounding error)
-  if (Math.abs(totalWithdrawn - spendingGoal) > 0.01) {
-    console.warn(`Warning: Unable to meet spending goal. Short by ${spendingGoal - totalWithdrawn}`);
   }
 
   return withdrawals;

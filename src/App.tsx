@@ -159,7 +159,7 @@ function App() {
         </div>
       </div>
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">Annual Spending Goal AFTER Taxes ($)</label>
+        <label className="block text-sm font-medium mb-2">Annual Spending Goal BEFORE Taxes ($)</label>
         <Input
           type="number"
           value={spendingGoal > 0 ? spendingGoal : ''}

@@ -20,7 +20,7 @@ describe("optimizeProportionally", () => {
     const result = optimizeProportionally(50000, 50000, 40000, 20000, "single");
     
     // Proportionally withdraw from Roth and Traditional
-    expect(result.fromTrad).toBeCloseTo(11000, 0);
+    expect(result.fromTrad).toBeCloseTo(10000, 0);
     expect(result.fromRoth).toBeCloseTo(10000, 0);
     expect(result.taxesPaid).toBeCloseTo(1000, 0); // 10% of Traditional withdrawal
   });
@@ -44,7 +44,7 @@ describe("optimizeProportionally", () => {
   it("should correctly handle edge case where only Traditional is available", () => {
     const result = optimizeProportionally(0, 50000, 40000, 20000, "single");
 
-    expect(result.fromTrad).toBeCloseTo(22250, 0); // Additional tax included
+    expect(result.fromTrad).toBeCloseTo(20000, 0);
     expect(result.fromRoth).toBe(0);
     expect(result.taxesPaid).toBeCloseTo(2250, 0);
   });
