@@ -10,6 +10,7 @@ import { optimizeProportionally } from "./tools/optimizeProportionally";
 import { optimizeRothFirst } from "./tools/optimizeRothFirst";
 import { optimizeTraditionalFirst } from "./tools/optimizeTraditionalFirst";
 import { IAges, ICalculations } from "./tools/types";
+import FormFieldWithTooltip from "./components/FormFieldWithTooltip";
 
 function App() {
   const [selection, setSelection] = useState<string>('');
@@ -37,8 +38,8 @@ function App() {
   };
 
   const doCalculations = (fn: any, strategyTxt: string) => {
-    let strategy = optimizeAndSimulateRetirement(fn, getAges(), afterTax, beforeTax, spendingGoal, 
-    filingStatus, investmentReturn/100, inflationRate/100);
+    let strategy = optimizeAndSimulateRetirement(fn, getAges(), afterTax, beforeTax, spendingGoal,
+      filingStatus, investmentReturn / 100, inflationRate / 100);
     setResults(strategy.details);
     setYearsLast(strategy.moneyLastYears);
     setSelection(strategyTxt)
@@ -49,16 +50,20 @@ function App() {
       <h2 className="text-2xl font-bold mb-8 text-center">Retirement Tax Calculator</h2>
       <div className="flex gap-6 mb-6">
         <div className="w-1/2">
-          <label className="block text-sm font-medium mb-2">Your Tax Filing Status</label>
-          <Select onValueChange={(value) => setFilingStatus(value as "single" | "married")}>
-            <SelectTrigger className="w-full max-w-[200px]">
-              <SelectValue placeholder="Select your status" />
-            </SelectTrigger>
-            <SelectContent className="z-50 absolute bg-white shadow-lg">
-              <SelectItem value="single">Single</SelectItem>
-              <SelectItem value="married">Married</SelectItem>
-            </SelectContent>
-          </Select>
+          <FormFieldWithTooltip
+            label="Your Tax Filing Status"
+            tooltipText="Select 'Single' if you're unmarried or legally separated. Select 'Married' if you're married and filing jointly."
+          >
+            <Select onValueChange={(value) => setFilingStatus(value as "single" | "married")}>
+              <SelectTrigger className="w-full max-w-[200px]">
+                <SelectValue placeholder="Select your status" />
+              </SelectTrigger>
+              <SelectContent className="z-50 absolute bg-white shadow-lg">
+                <SelectItem value="single">Single</SelectItem>
+                <SelectItem value="married">Married</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormFieldWithTooltip>
         </div>
       </div>
       <div className="flex gap-6 mb-6">
@@ -85,39 +90,13 @@ function App() {
       </div>
       <div className="flex gap-6 mb-6">
         <div className="w-1/2">
-          <label className="block text-sm font-medium mb-2">Your Retirement Age</label>
-          <Select onValueChange={(value) => setRetirementAgePrimary(Number(value))}>
-            <SelectTrigger className="w-full max-w-[200px]">
-              <SelectValue placeholder="Select retirement age" />
-            </SelectTrigger>
-            <SelectContent className="z-50 absolute bg-white shadow-lg">
-              {Array.from({ length: 20 }, (_, i) => 55 + i).map((age) => (
-                <SelectItem key={age} value={age.toString()}>{age}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="w-1/2">
-          <label className="block text-sm font-medium mb-2">Your Social Security Claim Age</label>
-          <Select onValueChange={(value) => setSsClaimAgePrimary(Number(value))}>
-            <SelectTrigger className="w-full max-w-[200px]">
-              <SelectValue placeholder="Select age" />
-            </SelectTrigger>
-            <SelectContent className="z-50 absolute bg-white shadow-lg">
-              {Array.from({ length: 10 }, (_, i) => 62 + i).map((age) => (
-                <SelectItem key={age} value={age.toString()}>{age}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      {filingStatus === "married" && (
-        <div className="flex gap-6 mb-6">
-          <div className="w-1/2">
-            <label className="block text-sm font-medium mb-2">Spouse Retirement Age</label>
-            <Select onValueChange={(value) => setRetirementAgeSecondary(Number(value))}>
+          <FormFieldWithTooltip
+            label="Your Retirement Age"
+            tooltipText="The age at which you will start withdrawing from your savings."
+          >
+            <Select onValueChange={(value) => setRetirementAgePrimary(Number(value))}>
               <SelectTrigger className="w-full max-w-[200px]">
-                <SelectValue placeholder="Select spouse's retirement age" />
+                <SelectValue placeholder="Select retirement age" />
               </SelectTrigger>
               <SelectContent className="z-50 absolute bg-white shadow-lg">
                 {Array.from({ length: 20 }, (_, i) => 55 + i).map((age) => (
@@ -125,10 +104,14 @@ function App() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-          <div className="w-1/2">
-            <label className="block text-sm font-medium mb-2">Spouse's Social Security Claim Age</label>
-            <Select onValueChange={(value) => setSsClaimAgeSpouse(Number(value))}>
+          </FormFieldWithTooltip>
+        </div>
+        <div className="w-1/2">
+          <FormFieldWithTooltip
+            label="Your Social Security Claim Age"
+            tooltipText="The age at which you will start claiming social security."
+          >
+            <Select onValueChange={(value) => setSsClaimAgePrimary(Number(value))}>
               <SelectTrigger className="w-full max-w-[200px]">
                 <SelectValue placeholder="Select age" />
               </SelectTrigger>
@@ -138,57 +121,110 @@ function App() {
                 ))}
               </SelectContent>
             </Select>
+          </FormFieldWithTooltip>
+        </div>
+      </div>
+      {filingStatus === "married" && (
+        <div className="flex gap-6 mb-6">
+          <div className="w-1/2">
+            <FormFieldWithTooltip
+              label="Spouse's Retirement Age"
+              tooltipText="The age at which your spouse will start withdrawing from your combined savings."
+            >
+              <Select onValueChange={(value) => setRetirementAgeSecondary(Number(value))}>
+                <SelectTrigger className="w-full max-w-[200px]">
+                  <SelectValue placeholder="Select spouse's retirement age" />
+                </SelectTrigger>
+                <SelectContent className="z-50 absolute bg-white shadow-lg">
+                  {Array.from({ length: 20 }, (_, i) => 55 + i).map((age) => (
+                    <SelectItem key={age} value={age.toString()}>{age}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormFieldWithTooltip>
+          </div>
+          <div className="w-1/2">
+            <FormFieldWithTooltip
+              label="Spouse's Social Security Claim Age"
+              tooltipText="The age at which your spouse will start claiming social security."
+            >
+              <Select onValueChange={(value) => setSsClaimAgeSpouse(Number(value))}>
+                <SelectTrigger className="w-full max-w-[200px]">
+                  <SelectValue placeholder="Select age" />
+                </SelectTrigger>
+                <SelectContent className="z-50 absolute bg-white shadow-lg">
+                  {Array.from({ length: 10 }, (_, i) => 62 + i).map((age) => (
+                    <SelectItem key={age} value={age.toString()}>{age}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormFieldWithTooltip>
           </div>
         </div>
       )}
       <div className="flex gap-6 mb-6">
         <div className="w-1/2">
-          <label className="block text-sm font-medium mb-2">After Tax Investments At Retirement, e.g. Roth ($)</label>
-          <Input
-            type="number"
-            value={afterTax > 0 ? afterTax : ''}
-            onChange={(e) => setAfterTax(Number(e.target.value))}
-            className="w-full max-w-[200px]"
-          />
+          <FormFieldWithTooltip
+            label="After Tax investments at retirement"
+            tooltipText="Investments such as Roth IRAs"
+          >
+            <Input
+              type="number"
+              value={afterTax > 0 ? afterTax : ''}
+              onChange={(e) => setAfterTax(Number(e.target.value))}
+              className="w-full max-w-[200px]"
+            />
+          </FormFieldWithTooltip>
         </div>
         <div className="w-1/2">
-          <label className="block text-sm font-medium mb-2">Before Tax Investments At Retirement, e.g. Traditional ($)</label>
-          <Input
-            type="number"
-            value={beforeTax > 0 ? beforeTax : ''}
-            onChange={(e) => setBeforeTax(Number(e.target.value))}
-            className="w-full max-w-[200px]"
-          />
+          <FormFieldWithTooltip
+            label="Before Tax investments at retirement"
+            tooltipText="Investments such as Traditional IRAs"
+          >
+            <Input
+              type="number"
+              value={beforeTax > 0 ? beforeTax : ''}
+              onChange={(e) => setBeforeTax(Number(e.target.value))}
+              className="w-full max-w-[200px]"
+            />
+          </FormFieldWithTooltip>
         </div>
       </div>
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">Annual Spending Goal BEFORE Taxes ($)</label>
-        <Input
-          type="number"
-          value={spendingGoal > 0 ? spendingGoal : ''}
-          onChange={(e) => setSpendingGoal(Number(e.target.value))}
-          className="w-full max-w-[200px]"
-        />
+        <FormFieldWithTooltip
+          label="Annual spending goal"
+          tooltipText="How much do you think you'll need for retirement per year before taxes"
+        >
+          <Input
+            type="number"
+            value={spendingGoal > 0 ? spendingGoal : ''}
+            onChange={(e) => setSpendingGoal(Number(e.target.value))}
+            className="w-full max-w-[200px]"
+          />
+        </FormFieldWithTooltip>
+
       </div>
-      {/* Inflation Rate Slider */}
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">
-          Yearly Inflation Rate: <strong>{inflationRate}%</strong>
-        </label>
-        <input
-          type="range"
-          min="1"
-          max="4"
-          step="1"
-          value={inflationRate}
-          onChange={(e) => setInflationRate(Number(e.target.value))}
-          className="w-full max-w-[200px]"
-        />
+        <FormFieldWithTooltip
+          label={`Inflation Rate: ${inflationRate}%`}
+          tooltipText="Average Price Changes Every Year"
+        >
+          <input
+            type="range"
+            min="1"
+            max="4"
+            step="1"
+            value={inflationRate}
+            onChange={(e) => setInflationRate(Number(e.target.value))}
+            className="w-full max-w-[200px]"
+          />
+        </FormFieldWithTooltip>
       </div>
-      <div className="w-1/3 mb-4">
-          <label className="block text-sm font-medium mb-2">
-            Investment Return: <strong>{investmentReturn}%</strong>
-          </label>
+      <div className="mb-6">
+        <FormFieldWithTooltip
+          label={`Investment Return: ${investmentReturn}%`}
+          tooltipText="Average Yearly Return on your Investments"
+        >
           <input
             type="range"
             min="3"
@@ -198,7 +234,9 @@ function App() {
             onChange={(e) => setInvestmentReturn(Number(e.target.value))}
             className="w-full max-w-[200px]"
           />
-        </div>
+        </FormFieldWithTooltip>
+
+      </div>
       <div className="flex flex-wrap gap-4 mb-8">
         <Button
           onClick={() => doCalculations(optimizeRothFirst, 'Roth First Strategy')}
