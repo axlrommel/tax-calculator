@@ -169,9 +169,9 @@ function App() {
             tooltipText="Investments such as Roth IRAs"
           >
             <Input
-              type="number"
-              value={afterTax > 0 ? afterTax : ''}
-              onChange={(e) => setAfterTax(Number(e.target.value))}
+              type="text"
+              value={afterTax > 0 ? `$${afterTax.toLocaleString()}` : ''}
+              onChange={(e) => setAfterTax(Number(e.target.value.replace(/[^0-9]/g, "")))}
               className="w-full max-w-[200px]"
             />
           </FormFieldWithTooltip>
@@ -182,9 +182,9 @@ function App() {
             tooltipText="Investments such as Traditional IRAs"
           >
             <Input
-              type="number"
-              value={beforeTax > 0 ? beforeTax : ''}
-              onChange={(e) => setBeforeTax(Number(e.target.value))}
+              type="text"
+              value={beforeTax > 0 ? `$${beforeTax.toLocaleString()}` : ''}
+              onChange={(e) => setBeforeTax(Number(e.target.value.replace(/[^0-9]/g, "")))}
               className="w-full max-w-[200px]"
             />
           </FormFieldWithTooltip>
@@ -196,9 +196,9 @@ function App() {
           tooltipText="How much do you think you'll need for retirement per year before taxes"
         >
           <Input
-            type="number"
-            value={spendingGoal > 0 ? spendingGoal : ''}
-            onChange={(e) => setSpendingGoal(Number(e.target.value))}
+            type="text"
+            value={spendingGoal > 0 ? `$${spendingGoal.toLocaleString()}` : ""}
+            onChange={(e) => setSpendingGoal(Number(e.target.value.replace(/[^0-9]/g, "")))}
             className="w-full max-w-[200px]"
           />
         </FormFieldWithTooltip>
