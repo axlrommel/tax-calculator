@@ -35,11 +35,11 @@ export function optimizeRothFirst(
 
   // Step 3: If still more needed, calculate Traditional IRA withdrawal
   if (remainingSpending > 0) {
-    // Calculate taxes on potential Traditional IRA withdrawal
-    let estimatedTradWithdrawal = remainingSpending;
+    // Actual withdrawal is limited by tradBalance
+    let actualTradWithdrawal = Math.min(remainingSpending, tradBalance);
 
     // Update provisional income with Traditional IRA withdrawal
-    let totalProvisionalIncome = provisionalIncome + estimatedTradWithdrawal;
+    let totalProvisionalIncome = provisionalIncome + actualTradWithdrawal;
 
     // Calculate taxable portion of Social Security
     const threshold = getThresholds(filingStatus);
@@ -50,14 +50,13 @@ export function optimizeRothFirst(
       ssTaxable = 0.5 * (totalProvisionalIncome - threshold.ssBase1);
     }
 
-    // Calculate total taxable income
-    taxableIncome = ssTaxable + estimatedTradWithdrawal;
+    // Calculate total taxable income based on actual withdrawal
+    taxableIncome = ssTaxable + actualTradWithdrawal;
 
     // Calculate taxes
     let tax = calculateTaxes(taxableIncome, filingStatus);
 
-    // Total needed from Traditional IRA is remaining spending
-    withdrawals.fromTrad = Math.min(remainingSpending, tradBalance);
+    withdrawals.fromTrad = actualTradWithdrawal;
     withdrawals.taxesPaid = tax;
   }
 
