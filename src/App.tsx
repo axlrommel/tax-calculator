@@ -84,44 +84,53 @@ function App() {
       <div className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">👤 Personal Information</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <FormFieldWithTooltip
-              label="Tax Filing Status"
-              tooltipText="Select 'Single' if you're unmarried or legally separated. Select 'Married' if you're married and filing jointly."
-            >
-              <Select onValueChange={(value) => setFilingStatus(value as "single" | "married")}>
-                <SelectTrigger className="w-full max-w-[250px]">
-                  <SelectValue placeholder="Select your status" />
-                </SelectTrigger>
-                <SelectContent className="z-50 absolute bg-white shadow-lg">
-                  <SelectItem value="single">Single</SelectItem>
-                  <SelectItem value="married">Married</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormFieldWithTooltip>
+        <div className="flex flex-col md:flex-row md:items-center gap-6">
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium">Filing Status:</span>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="filingStatus"
+                value="single"
+                checked={filingStatus === "single"}
+                onChange={(e) => setFilingStatus(e.target.value as "single" | "married")}
+                className="w-4 h-4 text-blue-600"
+              />
+              <span className="text-sm">Single</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="filingStatus"
+                value="married"
+                checked={filingStatus === "married"}
+                onChange={(e) => setFilingStatus(e.target.value as "single" | "married")}
+                className="w-4 h-4 text-blue-600"
+              />
+              <span className="text-sm">Married</span>
+            </label>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Your Current Age</label>
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium whitespace-nowrap">Your Age:</label>
             <Input
               type="number"
               value={currentAge > 0 ? currentAge : ''}
               onChange={(e) => setCurrentAge(Number(e.target.value))}
-              className="w-full max-w-[250px]"
-              placeholder="e.g., 55"
+              className="w-20"
+              placeholder="55"
             />
           </div>
 
           {filingStatus === "married" && (
-            <div>
-              <label className="block text-sm font-medium mb-2">Spouse's Current Age</label>
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium whitespace-nowrap">Spouse's Age:</label>
               <Input
                 type="number"
                 value={spouseCurrentAge > 0 ? spouseCurrentAge : ''}
                 onChange={(e) => setSpouseCurrentAge(Number(e.target.value))}
-                className="w-full max-w-[250px]"
-                placeholder="e.g., 55"
+                className="w-20"
+                placeholder="55"
               />
             </div>
           )}
@@ -215,27 +224,21 @@ function App() {
       <div className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">💰 Financial Assumptions</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <FormFieldWithTooltip
-              label="Annual Spending Goal"
-              tooltipText="How much do you think you'll need for retirement per year before taxes"
-            >
-              <Input
-                type="text"
-                value={spendingGoal > 0 ? `$${spendingGoal.toLocaleString()}` : ""}
-                onChange={(e) => setSpendingGoal(Number(e.target.value.replace(/[^0-9]/g, "")))}
-                className="w-full max-w-[250px]"
-                placeholder="e.g., $100,000"
-              />
-            </FormFieldWithTooltip>
+        <div className="flex flex-col md:flex-row md:items-center gap-6">
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium whitespace-nowrap">Annual Spending:</label>
+            <Input
+              type="text"
+              value={spendingGoal > 0 ? `$${spendingGoal.toLocaleString()}` : ""}
+              onChange={(e) => setSpendingGoal(Number(e.target.value.replace(/[^0-9]/g, "")))}
+              className="w-32"
+              placeholder="$100,000"
+            />
           </div>
 
-          <div>
-            <FormFieldWithTooltip
-              label={`Inflation Rate: ${inflationRate}%`}
-              tooltipText="Average Price Changes Every Year"
-            >
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium whitespace-nowrap">Inflation:</label>
+            <div className="flex items-center gap-2">
               <input
                 type="range"
                 min="1"
@@ -243,16 +246,15 @@ function App() {
                 step="1"
                 value={inflationRate}
                 onChange={(e) => setInflationRate(Number(e.target.value))}
-                className="w-full max-w-[250px]"
+                className="w-24"
               />
-            </FormFieldWithTooltip>
+              <span className="text-sm font-medium w-8">{inflationRate}%</span>
+            </div>
           </div>
 
-          <div>
-            <FormFieldWithTooltip
-              label={`Investment Return: ${investmentReturn}%`}
-              tooltipText="Average Yearly Return on your Investments"
-            >
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium whitespace-nowrap">Investment Return:</label>
+            <div className="flex items-center gap-2">
               <input
                 type="range"
                 min="3"
@@ -260,9 +262,10 @@ function App() {
                 step="1"
                 value={investmentReturn}
                 onChange={(e) => setInvestmentReturn(Number(e.target.value))}
-                className="w-full max-w-[250px]"
+                className="w-24"
               />
-            </FormFieldWithTooltip>
+              <span className="text-sm font-medium w-8">{investmentReturn}%</span>
+            </div>
           </div>
         </div>
       </div>
