@@ -15,6 +15,7 @@ interface IProps {
 }
 
 function ResultsSection(props: IProps) {
+  const [showTable, setShowTable] = useState<boolean>(false);
   const [showMedicare, setShowMedicare] = useState<boolean>(false);
   const [showRMD, setShowRMD] = useState<boolean>(false);
   const [showForcedRMD, setShowForcedRMD] = useState<boolean>(false);
@@ -60,43 +61,58 @@ function ResultsSection(props: IProps) {
           <label className="flex items-center space-x-3">
             <input
               type="checkbox"
-              checked={showMedicare}
-              onChange={() => setShowMedicare(!showMedicare)}
+              checked={showTable}
+              onChange={() => setShowTable(!showTable)}
               className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
             />
-            <span className="text-base">Show Medicare Costs</span>
+            <span className="text-base font-semibold">Show Detailed Table</span>
           </label>
-          <label className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={showRMD}
-              onChange={() => setShowRMD(!showRMD)}
-              className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
-            />
-            <span className="text-base">Show Required Minimum Distributions</span>
-          </label>
-          <label className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={showWithdrawals}
-              onChange={() => setShowWithdrawals(!showWithdrawals)}
-              className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
-            />
-            <span className="text-base">Show Withdrawals</span>
-          </label>
-          <label className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={showForcedRMD}
-              onChange={() => setShowForcedRMD(!showForcedRMD)}
-              className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
-            />
-            <span className="text-base">Show Forced Required Minimum Distributions</span>
-          </label>
+
+          {showTable && (
+            <div className="ml-8 flex flex-col space-y-2">
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={showMedicare}
+                  onChange={() => setShowMedicare(!showMedicare)}
+                  className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
+                />
+                <span className="text-sm">Show Medicare Costs</span>
+              </label>
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={showRMD}
+                  onChange={() => setShowRMD(!showRMD)}
+                  className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
+                />
+                <span className="text-sm">Show Required Minimum Distributions</span>
+              </label>
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={showWithdrawals}
+                  onChange={() => setShowWithdrawals(!showWithdrawals)}
+                  className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
+                />
+                <span className="text-sm">Show Withdrawals</span>
+              </label>
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={showForcedRMD}
+                  onChange={() => setShowForcedRMD(!showForcedRMD)}
+                  className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
+                />
+                <span className="text-sm">Show Forced Required Minimum Distributions</span>
+              </label>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="overflow-x-auto mt-6">
+      {showTable && (
+        <div className="overflow-x-auto mt-6">
         <table className="w-full border-collapse border text-base">
           <thead>
             <tr className="bg-gray-200 text-lg">
@@ -126,6 +142,7 @@ function ResultsSection(props: IProps) {
           </tbody>
         </table>
       </div>
+      )}
     </div>)
 }
 
